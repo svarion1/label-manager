@@ -11,7 +11,6 @@ bp = Blueprint("places", __name__)
 def add_place():
     name = (request.form.get("name") or "").strip()
     room = (request.form.get("room") or "").strip() or None
-    category_id = request.form.get("category_id", type=int)
     notes = (request.form.get("notes") or "").strip() or None
 
     if not name:
@@ -22,7 +21,7 @@ def add_place():
     short_code = qr_service.new_short_code()
     models.create_place(
         uuid=place_uuid, short_code=short_code, name=name,
-        room=room, category_id=category_id, notes=notes,
+        room=room, notes=notes,
     )
     flash(f"Place '{name}' added (code {short_code}).", "success")
     return redirect(url_for("main.index", tab="generate"))
@@ -41,12 +40,10 @@ def edit_place(place_id):
         place_id,
         name=name,
         room=(request.form.get("room") or "").strip() or None,
-        category_id=request.form.get("category_id", type=int),
         notes=(request.form.get("notes") or "").strip() or None,
     )
     flash("Place updated.", "success")
     return redirect(url_for("main.index", tab="edit"))
-
 
 @bp.route("/<int:place_id>/delete", methods=["POST"])
 def delete_place(place_id):

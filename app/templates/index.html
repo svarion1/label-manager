@@ -19,14 +19,6 @@
           {% for r in rooms %}<option value="{{ r }}">{% endfor %}
         </datalist>
       </label>
-      <label>Category
-        <select name="category_id">
-          <option value="">— none —</option>
-          {% for c in categories %}
-            <option value="{{ c['id'] }}">{{ c['name'] }}</option>
-          {% endfor %}
-        </select>
-      </label>
     </div>
     <label>Notes
       <textarea name="notes" rows="2"></textarea>
@@ -69,9 +61,6 @@
       <div class="place-card"
            data-search="{{ (p['name'] ~ ' ' ~ (p['room'] or '') ~ ' ' ~ (p['category_name'] or '')) | lower }}">
         <div class="place-head">
-         <span class="badge" data-bg="{{ p['category_color'] or '#6c757d' }}">
-            {{ p['category_name'] or 'Uncategorized' }}
-        </span>
           <h3>{{ p['name'] }}</h3>
           <small class="muted">
             {{ p['short_code'] }}
@@ -115,15 +104,6 @@
               class="edit-form">
           <input name="name" value="{{ p['name'] }}" required>
           <input name="room" value="{{ p['room'] or '' }}" placeholder="room">
-          <select name="category_id">
-            <option value="">— none —</option>
-            {% for c in categories %}
-              <option value="{{ c['id'] }}"
-                {% if p['category_id'] == c['id'] %}selected{% endif %}>
-                {{ c['name'] }}
-              </option>
-            {% endfor %}
-          </select>
           <button class="btn small primary" type="submit">Save</button>
         </form>
         <form method="POST"

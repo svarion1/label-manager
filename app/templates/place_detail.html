@@ -3,9 +3,6 @@
 
 {% block content %}
 <div class="card">
-  <span class="badge" data-bg="{{ place['category_color'] or '#6c757d' }}">
-    {{ place['category_name'] or 'Uncategorized' }}
-  </span>
   <h2>{{ place['name'] }}</h2>
   <p class="muted">
     Code: <strong>{{ place['short_code'] }}</strong>
@@ -19,7 +16,20 @@
   <form method="POST" action="{{ url_for('items.create_item') }}"
         enctype="multipart/form-data">
     <input type="hidden" name="place_id" value="{{ place['id'] }}">
-    <label>Title <input name="title" placeholder="e.g. HDMI cable"></label>
+    <div class="row">
+      <label>Title <input name="title" placeholder="e.g. HDMI cable"></label>
+      <label>Category
+        <select name="category_id">
+          <option value="">— none —</option>
+          {% for c in categories %}
+            <option value="{{ c['id'] }}">{{ c['name'] }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Subcategory
+        <input name="subcategory" placeholder="e.g. cables">
+      </label>
+    </div>
     <label>Notes <textarea name="notes" rows="2"></textarea></label>
     <label>Photos <input type="file" name="photos" accept="image/*" multiple></label>
     <button class="btn primary" type="submit">Add item</button>
@@ -36,8 +46,11 @@
       <strong>{{ it['title'] or '(untitled)' }}</strong>
       {% if it['category_name'] %}
         <span class="badge small" data-bg="{{ it['category_color'] or '#6c757d' }}">
-            {{ it['category_name'] }}
+          {{ it['category_name'] }}
         </span>
+      {% endif %}
+      {% if it['subcategory'] %}
+        <small class="muted">{{ it['subcategory'] }}</small>
       {% endif %}
     </div>
   {% else %}

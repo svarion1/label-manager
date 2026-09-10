@@ -20,15 +20,13 @@ def create_category(name, color="#6c757d"):
 
 
 # ---------- Places ----------
-
-def list_places(include_deleted=False, room=None, category_id=None):
+def list_places(include_deleted=False, room=None):
     db = get_db()
     sql = """
-        SELECT p.*, c.name AS category_name, c.color AS category_color,
+        SELECT p.*,
                (SELECT COUNT(*) FROM items i
                  WHERE i.place_id = p.id AND i.deleted_at IS NULL) AS item_count
         FROM places p
-        LEFT JOIN categories c ON c.id = p.category_id
         WHERE 1 = 1
     """
     params = []
@@ -37,50 +35,37 @@ def list_places(include_deleted=False, room=None, category_id=None):
     if room:
         sql += " AND p.room = ?"
         params.append(room)
-    if category_id:
-        sql += " AND p.category_id = ?"
-        params.append(category_id)
     sql += " ORDER BY p.room, p.name"
     return db.execute(sql, params).fetchall()
 
 
 def get_place(place_id, include_deleted=False):
-    db = get_db()
-    sql = """
-        SELECT p.*, c.name AS category_name, c.color AS category_color
-        FROM places p
-        LEFT JOIN categories c ON c.id = p.category_id
-        WHERE p.id = ?
-    """
+    sql = "SELECT * FROM places WHERE id = ?"
     if not include_deleted:
-        sql += " AND p.deleted_at IS NULL"
-    return db.execute(sql, (place_id,)).fetchone()
+        sql += " AND deleted_at IS NULL"
+    return get_db().execute(sql, (place_id,)).fetchone()
 
 
 def get_place_by_uuid(uuid):
     return get_db().execute(
-        """SELECT p.*, c.name AS category_name, c.color AS category_color
-           FROM places p
-           LEFT JOIN categories c ON c.id = p.category_id
-           WHERE p.uuid = ? AND p.deleted_at IS NULL""",
+        "SELECT * FROM places WHERE uuid = ? AND deleted_at IS NULL",
         (uuid,),
     ).fetchone()
 
 
-def create_place(uuid, short_code, name, room=None,
-                 category_id=None, notes=None):
+def create_place(uuid, short_code, name, room=None, notes=None):
     db = get_db()
     cur = db.execute(
-        """INSERT INTO places (uuid, short_code, name, room, category_id, notes)
-           VALUES (?, ?, ?, ?, ?, ?)""",
-        (uuid, short_code, name.strip(), room, category_id, notes),
+        """INSERT INTO places (uuid, short_code, name, room, notes)
+           VALUES (?, ?, ?, ?, ?)""",
+        (uuid, short_code, name.strip(), room, notes),
     )
     db.commit()
     return cur.lastrowid
 
 
 def update_place(place_id, **fields):
-    allowed = {"name", "room", "category_id", "notes"}
+    allowed = {"name", "room", "notes"}
     updates = {k: v for k, v in fields.items() if k in allowed}
     if not updates:
         return
@@ -143,18 +128,20 @@ def get_item(item_id, include_deleted=False):
     return get_db().execute(sql, (item_id,)).fetchone()
 
 
-def create_item(place_id, title=None, category_id=None, notes=None):
+def create_item(place_id, title=None, category_id=None,
+                subcategory=None, notes=None):
     db = get_db()
     cur = db.execute(
-        "INSERT INTO items (place_id, title, category_id, notes) VALUES (?, ?, ?, ?)",
-        (place_id, title, category_id, notes),
+        """INSERT INTO items (place_id, title, category_id, subcategory, notes)
+           VALUES (?, ?, ?, ?, ?)""",
+        (place_id, title, category_id, subcategory, notes),
     )
     db.commit()
     return cur.lastrowid
 
 
 def update_item(item_id, **fields):
-    allowed = {"title", "category_id", "notes"}
+    allowed = {"title", "category_id", "subcategory", "notes"}
     updates = {k: v for k, v in fields.items() if k in allowed}
     if not updates:
         return
@@ -165,7 +152,6 @@ def update_item(item_id, **fields):
         list(updates.values()) + [item_id],
     )
     db.commit()
-
 
 def soft_delete_item(item_id):
     db = get_db()

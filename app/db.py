@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS places (
     short_code  TEXT NOT NULL UNIQUE,
     name        TEXT NOT NULL,
     room        TEXT,
-    category_id INTEGER REFERENCES categories(id),
     notes       TEXT,
     created_at  TEXT DEFAULT (datetime('now')),
     updated_at  TEXT DEFAULT (datetime('now')),
@@ -26,14 +25,15 @@ CREATE TABLE IF NOT EXISTS places (
 );
 
 CREATE TABLE IF NOT EXISTS items (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    place_id    INTEGER NOT NULL REFERENCES places(id),
-    title       TEXT,
-    category_id INTEGER REFERENCES categories(id),
-    notes       TEXT,
-    created_at  TEXT DEFAULT (datetime('now')),
-    updated_at  TEXT DEFAULT (datetime('now')),
-    deleted_at  TEXT
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    place_id     INTEGER NOT NULL REFERENCES places(id),
+    title        TEXT,
+    category_id  INTEGER REFERENCES categories(id),
+    subcategory  TEXT,
+    notes        TEXT,
+    created_at   TEXT DEFAULT (datetime('now')),
+    updated_at   TEXT DEFAULT (datetime('now')),
+    deleted_at   TEXT
 );
 
 CREATE TABLE IF NOT EXISTS item_photos (

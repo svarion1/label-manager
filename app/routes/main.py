@@ -15,10 +15,8 @@ def index():
         categories=models.list_categories(),
     )
 
-
 @bp.route("/l/<uuid>")
 def place_by_uuid(uuid):
-    """The URL your QR codes point to. Opens the place on mobile."""
     place = models.get_place_by_uuid(uuid)
     if not place:
         return render_template(
@@ -26,4 +24,10 @@ def place_by_uuid(uuid):
             message="No place found for this label.",
         ), 404
     items = models.list_items_for_place(place["id"])
-    return render_template("place_detail.html", place=place, items=items)
+    categories = models.list_categories()
+    return render_template(
+        "place_detail.html",
+        place=place,
+        items=items,
+        categories=categories,
+    )

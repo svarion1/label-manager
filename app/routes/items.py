@@ -33,6 +33,7 @@ def create_item():
         place_id,
         title=(request.form.get("title") or "").strip() or None,
         category_id=request.form.get("category_id", type=int),
+        subcategory=(request.form.get("subcategory") or "").strip() or None,
         notes=(request.form.get("notes") or "").strip() or None,
     )
 
@@ -53,6 +54,7 @@ def edit_item(item_id):
         item_id,
         title=(request.form.get("title") or "").strip() or None,
         category_id=request.form.get("category_id", type=int),
+        subcategory=(request.form.get("subcategory") or "").strip() or None,
         notes=(request.form.get("notes") or "").strip() or None,
     )
     for f in request.files.getlist("photos"):
