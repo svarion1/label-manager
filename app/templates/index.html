@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Label Manager{% endblock %}
+
+{% block content %}
+
+{# ==================== GENERATE ==================== #}
+<section class="panel {% if active_tab == 'generate' %}active{% endif %}">
+  <h2>Generate Labels</h2>
+
+  <form method="POST" action="{{ url_for('places.add_place') }}" class="card">
+    <h3>Add a new place</h3>
+    <div class="row">
+      <label>Name
+        <input name="name" required placeholder="e.g. Scatola 3">
+      </label>
+      <label>Room
+        <input name="room" list="rooms-list" placeholder="e.g. studio">
+        <datalist id="rooms-list">
+          {% for r in rooms %}<option value="{{ r }}">{% endfor %}
+        </datalist>
+      </label>
+      <label>Category
+        <select name="category_id">
+          <option value="">— none —</option>
+          {% for c in categories %}
+            <option value="{{ c['id'] }}">{{ c['name'] }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+    <label>Notes
+      <textarea name="notes" rows="2"></textarea>
+    </label>
+    <button class="btn primary" type="submit">Add place</button>
+  </form>
+
+  <form method="POST" action="{{ url_for('labels.generate_pdf') }}" class="card">
+    <h3>Print labels</h3>
+    <p class="muted">Select the places you want. Leave everything unselected to print all.</p>
+
+    <div class="checkbox-grid">
+      {% for p in places %}
+        <label class="check">
+          <input type="checkbox" name="place_ids" value="{{ p['id'] }}">
+          <span>
+            <strong>{{ p['name'] }}</strong>
+            <small>
+              {{ p['short_code'] }}{% if p['room'] %} · {{ p['room'] }}{% endif %}
+            </small>
+          </span>
+        </label>
+      {% else %}
+        <p class="muted">No places yet. Add one above.</p>
+      {% endfor %}
+    </div>
+
+    <button class="btn primary" type="submit">Download PDF</button>
+  </form>
+</section>
+
+{# ==================== CLOSET ==================== #}
+<section class="panel {% if active_tab == 'closet' %}active{% endif %}">
+  <h2>Your Closet</h2>
+  <input type="search" id="closet-search"
+         placeholder="Search places, rooms, categories…" class="search">
+
+  <div class="place-list" id="closet-list">
+    {% for p in places %}
+      <div class="place-card"
+           data-search="{{ (p['name'] ~ ' ' ~ (p['room'] or '') ~ ' ' ~ (p['category_name'] or '')) | lower }}">
+        <div class="place-head">
+         <span class="badge" data-bg="{{ p['category_color'] or '#6c757d' }}">
+            {{ p['category_name'] or 'Uncategorized' }}
+        </span>
+          <h3>{{ p['name'] }}</h3>
+          <small class="muted">
+            {{ p['short_code'] }}
+            {% if p['room'] %} · {{ p['room'] }}{% endif %}
+            · {{ p['item_count'] }} item{{ 's' if p['item_count'] != 1 }}
+          </small>
+        </div>
+        <div class="place-actions">
+          <a class="btn small"
+             href="{{ url_for('main.place_by_uuid', uuid=p['uuid']) }}">Open</a>
+          <a class="btn small"
+             href="{{ url_for('places.qr_png', place_id=p['id']) }}"
+             target="_blank">QR</a>
+        </div>
+      </div>
+    {% else %}
+      <p class="muted">No places yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+{# ==================== EDIT ==================== #}
+<section class="panel {% if active_tab == 'edit' %}active{% endif %}">
+  <h2>Edit</h2>
+
+  <details class="card">
+    <summary>Add a category</summary>
+    <form method="POST" action="{{ url_for('places.add_category') }}"
+          class="row" style="margin-top:.75rem">
+      <label>Name <input name="name" required></label>
+      <label>Color <input type="color" name="color" value="#6c757d"></label>
+      <button class="btn primary" type="submit">Add</button>
+    </form>
+  </details>
+
+  <div class="edit-list">
+    {% for p in places %}
+      <div class="card edit-row">
+        <form method="POST"
+              action="{{ url_for('places.edit_place', place_id=p['id']) }}"
+              class="edit-form">
+          <input name="name" value="{{ p['name'] }}" required>
+          <input name="room" value="{{ p['room'] or '' }}" placeholder="room">
+          <select name="category_id">
+            <option value="">— none —</option>
+            {% for c in categories %}
+              <option value="{{ c['id'] }}"
+                {% if p['category_id'] == c['id'] %}selected{% endif %}>
+                {{ c['name'] }}
+              </option>
+            {% endfor %}
+          </select>
+          <button class="btn small primary" type="submit">Save</button>
+        </form>
+        <form method="POST"
+              action="{{ url_for('places.delete_place', place_id=p['id']) }}"
+              onsubmit="return confirm('Move this place to trash?');">
+          <button class="btn small danger" type="submit">Delete</button>
+        </form>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const search = document.getElementById('closet-search');
+  if (search) {
+    search.addEventListener('input', () => {
+      const q = search.value.toLowerCase().trim();
+      document.querySelectorAll('#closet-list .place-card').forEach(card => {
+        card.style.display = card.dataset.search.includes(q) ? '' : 'none';
+      });
+    });
+  }
+</script>
+{% endblock %}

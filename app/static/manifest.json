@@ -1,0 +1,9 @@
+{
+  "name": "Label Manager Scanner",
+  "short_name": "Labels",
+  "start_url": "/scan/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#111827",
+  "icons": []
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>{% block title %}Label Manager{% endblock %}</title>
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">🏷️ Label Manager</div>
+  <nav class="tabs">
+    <a href="{{ url_for('main.index', tab='generate') }}"
+       class="tab {% if active_tab == 'generate' %}active{% endif %}">Generate</a>
+    <a href="{{ url_for('main.index', tab='closet') }}"
+       class="tab {% if active_tab == 'closet' %}active{% endif %}">Closet</a>
+    <a href="{{ url_for('main.index', tab='edit') }}"
+       class="tab {% if active_tab == 'edit' %}active{% endif %}">Edit</a>
+    <a href="{{ url_for('scan.scan_page') }}"
+       class="tab {% if active_tab == 'scan' %}active{% endif %}">Scan</a>
+  </nav>
+</header>
+
+<main class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

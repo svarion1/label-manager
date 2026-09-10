@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ place['name'] }}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <span class="badge" data-bg="{{ place['category_color'] or '#6c757d' }}">
+    {{ place['category_name'] or 'Uncategorized' }}
+  </span>
+  <h2>{{ place['name'] }}</h2>
+  <p class="muted">
+    Code: <strong>{{ place['short_code'] }}</strong>
+    {% if place['room'] %} · Room: {{ place['room'] }}{% endif %}
+  </p>
+  {% if place['notes'] %}<p>{{ place['notes'] }}</p>{% endif %}
+</div>
+
+<div class="card">
+  <h3>Add an item here</h3>
+  <form method="POST" action="{{ url_for('items.create_item') }}"
+        enctype="multipart/form-data">
+    <input type="hidden" name="place_id" value="{{ place['id'] }}">
+    <label>Title <input name="title" placeholder="e.g. HDMI cable"></label>
+    <label>Notes <textarea name="notes" rows="2"></textarea></label>
+    <label>Photos <input type="file" name="photos" accept="image/*" multiple></label>
+    <button class="btn primary" type="submit">Add item</button>
+  </form>
+</div>
+
+<h3>Items ({{ items|length }})</h3>
+<div class="item-grid">
+  {% for it in items %}
+    <div class="item-card">
+      {% if it['first_photo_id'] %}
+        <img src="{{ url_for('items.serve_photo', photo_id=it['first_photo_id']) }}" alt="">
+      {% endif %}
+      <strong>{{ it['title'] or '(untitled)' }}</strong>
+      {% if it['category_name'] %}
+        <span class="badge small" data-bg="{{ it['category_color'] or '#6c757d' }}">
+            {{ it['category_name'] }}
+        </span>
+      {% endif %}
+    </div>
+  {% else %}
+    <p class="muted">No items yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}
