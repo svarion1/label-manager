@@ -148,6 +148,62 @@ textarea { resize: vertical; }
 
 .error-card { text-align: center; padding: 2rem; }
 
+
+/* Categories management */
+.category-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-row {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  padding: .4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.category-row:last-child { border-bottom: none; }
+
+.category-form {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  flex: 1;
+}
+.category-form input[name="name"] { flex: 1; margin-top: 0; }
+.category-form .cat-count { flex: 0 0 auto; white-space: nowrap; }
+
+.color-input {
+  width: 42px;
+  height: 34px;
+  padding: 2px;
+  margin-top: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  flex: 0 0 42px;
+}
+
+.delete-details summary {
+  list-style: none;
+  display: inline-block;
+  user-select: none;
+}
+.delete-details summary::-webkit-details-marker { display: none; }
+
+.reassign-form {
+  display: flex;
+  gap: .5rem;
+  align-items: flex-end;
+  padding: .5rem;
+  margin-top: .35rem;
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.reassign-form label { margin-bottom: 0; }
+.reassign-form select { margin-top: 0; }
+
 @media (max-width: 600px) {
   .edit-form { flex-direction: column; }
 }

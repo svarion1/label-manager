@@ -27,6 +27,36 @@ def add_place():
     return redirect(url_for("main.index", tab="generate"))
 
 
+@bp.route("/categories/<int:category_id>/edit", methods=["POST"])
+def edit_category(category_id):
+    if not models.get_category(category_id):
+        abort(404)
+    name = (request.form.get("name") or "").strip()
+    color = (request.form.get("color") or "#6c757d").strip()
+    if not name:
+        flash("Category name required.", "danger")
+        return redirect(url_for("main.index", tab="edit"))
+    try:
+        models.update_category(category_id, name=name, color=color)
+        flash(f"Category '{name}' updated.", "success")
+    except Exception:
+        flash("Another category already uses that name.", "warning")
+    return redirect(url_for("main.index", tab="edit"))
+
+
+@bp.route("/categories/<int:category_id>/delete", methods=["POST"])
+def delete_category(category_id):
+    cat = models.get_category(category_id)
+    if not cat:
+        abort(404)
+    reassign_to = request.form.get("reassign_to", type=int)
+    models.delete_category(category_id, reassign_to=reassign_to)
+    if reassign_to:
+        flash(f"'{cat['name']}' deleted, items moved.", "warning")
+    else:
+        flash(f"'{cat['name']}' deleted, items now uncategorized.", "warning")
+    return redirect(url_for("main.index", tab="edit"))
+
 @bp.route("/<int:place_id>/edit", methods=["POST"])
 def edit_place(place_id):
     if not models.get_place(place_id):

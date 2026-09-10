@@ -18,7 +18,58 @@ def create_category(name, color="#6c757d"):
     db.commit()
     return cur.lastrowid
 
+def list_categories_with_counts():
+    return get_db().execute("""
+        SELECT c.*,
+               (SELECT COUNT(*) FROM items i
+                 WHERE i.category_id = c.id AND i.deleted_at IS NULL) AS item_count
+        FROM categories c
+        ORDER BY c.name
+    """).fetchall()
 
+
+def get_category(category_id):
+    return get_db().execute(
+        "SELECT * FROM categories WHERE id = ?", (category_id,)
+    ).fetchone()
+
+
+def update_category(category_id, name=None, color=None):
+    fields = {}
+    if name is not None:
+        fields["name"] = name.strip()
+    if color is not None:
+        fields["color"] = color.strip()
+    if not fields:
+        return
+    db = get_db()
+    set_clause = ", ".join(f"{k} = ?" for k in fields)
+    db.execute(
+        f"UPDATE categories SET {set_clause} WHERE id = ?",
+        list(fields.values()) + [category_id],
+    )
+    db.commit()
+
+
+def delete_category(category_id, reassign_to=None):
+    """
+    Delete a category. If reassign_to is a valid category id, move any
+    items using this category there. Otherwise set their category_id to NULL.
+    """
+    db = get_db()
+    if reassign_to:
+        db.execute(
+            "UPDATE items SET category_id = ? WHERE category_id = ?",
+            (reassign_to, category_id),
+        )
+    else:
+        db.execute(
+            "UPDATE items SET category_id = NULL WHERE category_id = ?",
+            (category_id,),
+        )
+    db.execute("DELETE FROM categories WHERE id = ?", (category_id,))
+    db.commit()
+    
 # ---------- Places ----------
 def list_places(include_deleted=False, room=None):
     db = get_db()

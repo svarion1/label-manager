@@ -3,7 +3,6 @@ from  app import models
 
 bp = Blueprint("main", __name__)
 
-
 @bp.route("/")
 def index():
     tab = request.args.get("tab", "generate")
@@ -12,7 +11,7 @@ def index():
         active_tab=tab,
         places=models.list_places(),
         rooms=models.list_rooms(),
-        categories=models.list_categories(),
+        categories=models.list_categories_with_counts(),
     )
 
 @bp.route("/l/<uuid>")

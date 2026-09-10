@@ -86,15 +86,68 @@
 <section class="panel {% if active_tab == 'edit' %}active{% endif %}">
   <h2>Edit</h2>
 
-  <details class="card">
-    <summary>Add a category</summary>
-    <form method="POST" action="{{ url_for('places.add_category') }}"
-          class="row" style="margin-top:.75rem">
-      <label>Name <input name="name" required></label>
-      <label>Color <input type="color" name="color" value="#6c757d"></label>
-      <button class="btn primary" type="submit">Add</button>
-    </form>
-  </details>
+  <div class="card">
+  <h3>Categories</h3>
+
+  <form method="POST" action="{{ url_for('places.add_category') }}"
+        class="row" style="margin-bottom:1rem">
+    <label>Name
+      <input name="name" required placeholder="New category">
+    </label>
+    <label style="max-width:120px">Color
+      <input type="color" name="color" value="#6c757d">
+    </label>
+    <button class="btn primary" type="submit">Add</button>
+  </form>
+
+  <div class="category-list">
+    {% for c in categories %}
+      <div class="category-row">
+        <form method="POST"
+              action="{{ url_for('places.edit_category', category_id=c['id']) }}"
+              class="category-form">
+          <input type="color" name="color" value="{{ c['color'] }}"
+                 class="color-input" title="Color">
+          <input name="name" value="{{ c['name'] }}" required>
+          <span class="cat-count muted">
+            {{ c['item_count'] }} item{{ 's' if c['item_count'] != 1 }}
+          </span>
+          <button class="btn small primary" type="submit">Save</button>
+        </form>
+
+        {% if c['item_count'] == 0 %}
+          <form method="POST"
+                action="{{ url_for('places.delete_category', category_id=c['id']) }}"
+                onsubmit="return confirm('Delete category {{ c['name'] }}?');">
+            <button class="btn small danger" type="submit">Delete</button>
+          </form>
+        {% else %}
+          <details class="delete-details">
+            <summary class="btn small danger">Delete</summary>
+            <form method="POST"
+                  action="{{ url_for('places.delete_category', category_id=c['id']) }}"
+                  class="reassign-form">
+              <label>Reassign items to
+                <select name="reassign_to">
+                  <option value="">— uncategorized —</option>
+                  {% for other in categories if other['id'] != c['id'] %}
+                    <option value="{{ other['id'] }}">{{ other['name'] }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+              <button class="btn small danger" type="submit"
+                      onclick="return confirm('Delete {{ c['name'] }} and move its {{ c['item_count'] }} item(s)?');">
+                Confirm delete
+              </button>
+            </form>
+          </details>
+        {% endif %}
+      </div>
+    {% else %}
+      <p class="muted">No categories yet.</p>
+    {% endfor %}
+  </div>
+</div>
 
   <div class="edit-list">
     {% for p in places %}

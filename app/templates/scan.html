@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Scan{% endblock %}
+
+{% block content %}
+<div class="card scan-card">
+  <h2>Scan a label</h2>
+  <video id="scanner-video" playsinline muted></video>
+  <p id="scanner-status" class="muted">Point the camera at a QR code.</p>
+
+  <div id="scan-result" class="hidden">
+    <h3 id="scan-place-name"></h3>
+    <form id="scan-form" enctype="multipart/form-data">
+      <input type="hidden" name="uuid" id="scan-uuid">
+      <label>Title <input name="title" required></label>
+      <label>Notes <textarea name="notes" rows="2"></textarea></label>
+      <label>Photo <input type="file" name="photo" accept="image/*" capture="environment"></label>
+      <button class="btn primary" type="submit">Save item</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+{% endblock %}
