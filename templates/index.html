@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catalogo oggetti</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Catalogo oggetti</h1>
+
+  <form action="/add" method="post">
+    <label>Nome del luogo (uno per riga):</label>
+    <textarea name="names" rows="4" placeholder="Cassettiera rossa
+Scatola plastica"></textarea>
+    <label>Stanza
+      <select name="room">
+        <option value="">Scegli una stanza</option>
+        {% for room in ['camera letto ale', 'studio', 'garage', 'salotto', 'bagno', 'corridoio'] %}
+          <option value="{{ room }}">{{ room }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Luogo
+      <select name="place_id">
+        <option value="">Tutti</option>
+        {% for place in places %}
+          <option value="{{ place['id'] }}" {% if place['id']|string == selected_place_id %}selected{% endif %}>{{ place['name'] }}{% if place['room'] %} · {{ place['room'] }}{% endif %}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit">Aggiungi luoghi</button>
+  </form>
+
+  <div class="actions">
+    <form action="/generate" method="post">
+      <button type="submit">Genera PDF etichette</button>
+    </form>
+    <a class="button-link" href="/scan">Apri scanner mobile</a>
+  </div>
+
+  <section class="places-section">
+    <h2>Luoghi esistenti</h2>
+    <div class="place-list">
+      {% for place in places %}
+        <div class="place-row">
+          <span><strong>{{ place['name'] }}</strong>{% if place['room'] %} · {{ place['room'] }}{% endif %}</span>
+          <a class="button-link" href="{{ url_for('edit_place', place_id=place['id']) }}">Modifica luogo</a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <form class="filters" method="get">
+    <label>Categoria oggetto
+      <select name="category">
+        <option value="">Tutte</option>
+        {% for item in categories %}
+          <option value="{{ item['category'] }}" {% if item['category'] == selected_category %}selected{% endif %}>{{ item['category'] }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Sottocategoria oggetto
+      <select name="subcategory">
+        <option value="">Tutte</option>
+        {% for item in subcategories %}
+          <option value="{{ item['subcategory'] }}" {% if item['subcategory'] == selected_subcategory %}selected{% endif %}>{{ item['subcategory'] }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Stanza
+      <select name="room">
+        <option value="">Tutte</option>
+        {% for item in rooms %}
+          <option value="{{ item['room'] }}" {% if item['room'] == selected_room %}selected{% endif %}>{{ item['room'] }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit">Filtra</button>
+    <a href="/">Reset</a>
+  </form>
+
+  <p class="count">{{ objects|length }} oggetti fotografati</p>
+  <section class="catalog">
+    {% for item in objects %}
+    <article class="item-card">
+      <div class="item-image">
+        <img src="{{ url_for('uploaded_file', filename=item['filename']) }}" alt="{{ item['title'] }}">
+      </div>
+      <div class="item-content">
+        <p class="item-number">#{{ item['id'] }}</p>
+        <h2>{{ item['title'] }}</h2>
+        <p class="tags">{{ item['category'] or 'Senza categoria' }}{% if item['subcategory'] %} · {{ item['subcategory'] }}{% endif %}</p>
+        <p class="image-count">Luogo: {{ item['place_name'] }}{% if item['room'] %} · {{ item['room'] }}{% endif %}</p>
+        <div class="card-actions">
+          <a class="button-link" href="{{ url_for('edit_object', image_id=item['id']) }}">Modifica oggetto</a>
+          <a class="button-link" href="{{ url_for('upload_page', uuid=item['uuid']) }}">Gestisci luogo</a>
+        </div>
+      </div>
+    </article>
+    {% else %}
+      <p>Nessun oggetto fotografato ancora. Scansiona un’etichetta e carica la prima foto.</p>
+    {% endfor %}
+  </section>
+</body>
+</html>

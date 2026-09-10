@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modifica oggetto</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Modifica oggetto</h1>
+  <p>Luogo: {{ image['place_name'] }}</p>
+  <form method="post">
+    <label>Titolo oggetto
+      <input name="title" value="{{ image['title'] or '' }}" required>
+    </label>
+    <label>Categoria
+      <input name="category" value="{{ image['category'] or '' }}">
+    </label>
+    <label>Sottocategoria
+      <input name="subcategory" value="{{ image['subcategory'] or '' }}">
+    </label>
+    <button type="submit">Salva modifiche</button>
+    <a class="button-link" href="/">Annulla</a>
+  </form>
+</body>
+</html>
