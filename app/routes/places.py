@@ -1,6 +1,6 @@
 from flask import (Blueprint, request, redirect, url_for, flash,
                    abort, send_file)
-from old.app import models
+from app import models
 from app.services import qr_service, pdf_service
 from config import Config
 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from flask import (Blueprint, request, redirect, url_for, flash,
                    abort, send_from_directory)
-from old.app import models
+from app import models
 from config import Config
 
 bp = Blueprint("items", __name__)

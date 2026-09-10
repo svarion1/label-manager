@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request
-from old.app import models
+from  app import models
 
 bp = Blueprint("scan", __name__)
 

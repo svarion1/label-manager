@@ -1,5 +1,5 @@
 from flask import Blueprint, request, send_file, redirect, url_for, flash
-from old.app import models
+from app import models
 from app.services import pdf_service
 from config import Config
 
