@@ -95,9 +95,13 @@
     }
   });
 
-  try {
+   try {
     await startCamera();
   } catch (err) {
-    status.textContent = 'Camera access denied or unavailable.';
+    status.innerHTML =
+      'Camera access needs <strong>HTTPS or localhost</strong>. ' +
+      'On plain LAN HTTP the browser blocks it. ' +
+      'Use your phone\'s native camera on the QR instead.';
+    video.style.display = 'none';
   }
 })();

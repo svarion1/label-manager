@@ -34,6 +34,9 @@ html, body {
 
 .container { max-width: 1000px; margin: 0 auto; padding: 1rem; }
 
+.panel { display: none; }
+.panel.active { display: block; }
+
 .card {
   background: var(--card);
   border: 1px solid var(--border);
