@@ -118,7 +118,7 @@
         {% if c['item_count'] == 0 %}
           <form method="POST"
                 action="{{ url_for('places.delete_category', category_id=c['id']) }}"
-                onsubmit="return confirm('Delete category {{ c['name'] }}?');">
+                onsubmit="return confirm('Delete category {{ c.name }}?');">
             <button class="btn small danger" type="submit">Delete</button>
           </form>
         {% else %}
@@ -136,7 +136,7 @@
                 </select>
               </label>
               <button class="btn small danger" type="submit"
-                      onclick="return confirm('Delete {{ c['name'] }} and move its {{ c['item_count'] }} item(s)?');">
+                      onclick="return confirm('Delete {{ c.name }} and move its {{ c.item_count }} item(s)?');">
                 Confirm delete
               </button>
             </form>

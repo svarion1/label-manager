@@ -41,7 +41,7 @@
   {% for it in items %}
     <div class="item-card">
       {% if it['first_photo_id'] %}
-        <img src="{{ url_for('items.serve_photo', photo_id=it['first_photo_id']) }}" alt="">
+        <img src="{{ url_for('items.serve_thumb', photo_id=it['first_photo_id']) }}" alt="">
       {% endif %}
       <strong>{{ it['title'] or '(untitled)' }}</strong>
       {% if it['category_name'] %}

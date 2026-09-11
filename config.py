@@ -15,6 +15,12 @@ class Config:
 
     ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 
+    # Image processing
+    MAX_IMAGE_DIM   = int(os.environ.get("MAX_IMAGE_DIM", 1920))   # longest side
+    THUMB_WIDTH     = int(os.environ.get("THUMB_WIDTH", 400))
+    WEBP_QUALITY    = int(os.environ.get("WEBP_QUALITY", 82))
+    THUMB_QUALITY   = int(os.environ.get("THUMB_QUALITY", 75))
+
     @classmethod
     def init_dirs(cls):
         for d in (cls.DATA_DIR, cls.UPLOAD_DIR, cls.OUTPUT_DIR):

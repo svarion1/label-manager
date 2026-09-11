@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import (Blueprint, request, redirect, url_for, flash,
                    abort, send_from_directory)
 from app import models
+from app.services import image_service
 from config import Config
 
 bp = Blueprint("items", __name__)
@@ -39,7 +40,9 @@ def create_item():
 
     for f in request.files.getlist("photos"):
         if f and f.filename and _allowed(f.filename):
-            models.add_photo(item_id, filepath=_save_upload(f))
+            base = uuid_lib.uuid4().hex
+            main_name, thumb_name = image_service.process_upload(f, base)
+            models.add_photo(item_id, filepath=main_name, thumb_path=thumb_name)
 
     flash("Item added.", "success")
     return redirect(request.referrer or url_for("main.index", tab="closet"))
@@ -59,7 +62,9 @@ def edit_item(item_id):
     )
     for f in request.files.getlist("photos"):
         if f and f.filename and _allowed(f.filename):
-            models.add_photo(item_id, filepath=_save_upload(f))
+            base = uuid_lib.uuid4().hex
+            main_name, thumb_name = image_service.process_upload(f, base)
+            models.add_photo(item_id, filepath=main_name, thumb_path=thumb_name)
 
     flash("Item updated.", "success")
     return redirect(request.referrer or url_for("main.index", tab="edit"))
@@ -92,3 +97,13 @@ def delete_photo(photo_id):
     models.delete_photo(photo_id)
     flash("Photo removed.", "success")
     return redirect(request.referrer or url_for("main.index", tab="edit"))
+
+@bp.route("/photo/<int:photo_id>/thumb")
+def serve_thumb(photo_id):
+    photo = models.get_photo(photo_id)
+    if not photo:
+        abort(404)
+    if photo["thumb_path"]:
+        return send_from_directory(Config.UPLOAD_DIR, photo["thumb_path"])
+    # Fallback to full image if thumb missing (old records)
+    return send_from_directory(Config.UPLOAD_DIR, photo["filepath"])
